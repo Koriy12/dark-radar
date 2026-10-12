@@ -1,0 +1,381 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dark Sol Radar | AI Sniper & Copy-Trade</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandDark: '#0b0e14',
+                        brandCard: '#131823',
+                        brandAccent: '#10b981',
+                        brandPurple: '#8b5cf6',
+                        brandNeon: '#00f2fe'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0b0e14;
+            color: #f3f4f6;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .custom-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .custom-scroll {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden">
+
+    <!-- ВЕРХНЯ ШАПКА -->
+    <header class="p-4 bg-brandCard/90 border-b border-gray-800 flex justify-between items-center backdrop-blur-md">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brandPurple to-brandNeon flex items-center justify-center font-black text-black shadow-lg shadow-cyan-500/20">
+                <i class="fa-solid fa-radar text-lg text-white"></i>
+            </div>
+            <div>
+                <div class="text-sm font-bold tracking-wide flex items-center gap-1.5">
+                    DARK RADAR <span class="bg-emerald-500/20 text-emerald-400 text-[10px] px-1.5 py-0.5 rounded-full font-semibold border border-emerald-500/30">AI v2.4</span>
+                </div>
+                <div class="text-[11px] text-gray-400 flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    SOL Network: 2,420 TPS
+                </div>
+            </div>
+        </div>
+        <button onclick="toggleModal('deposit-modal')" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:opacity-90 active:scale-95 transition-all text-xs font-bold px-3 py-2 rounded-lg flex items-center gap-1.5 shadow-lg shadow-emerald-500/20">
+            <i class="fa-solid fa-wallet"></i> Депозит
+        </button>
+    </header>
+
+    <!-- БАЛАНС ТА ГОЛОВНИЙ ПЕРЕМИКАЧ -->
+    <section class="p-4 bg-brandCard/40 border-b border-gray-800/80">
+        <div class="flex justify-between items-center">
+            <div>
+                <div class="text-[11px] uppercase tracking-wider text-gray-400 font-semibold">Баланс гаманця</div>
+                <div class="text-2xl font-black flex items-center gap-1 mt-0.5">
+                    <span id="user-balance">2.450</span> <span class="text-emerald-400 text-sm font-bold">SOL</span>
+                    <span class="text-xs text-gray-400 font-normal ml-1">(~$470.40)</span>
+                </div>
+            </div>
+            <div class="flex flex-col items-end">
+                <span class="text-[11px] text-gray-400 mb-1">Авто-копіювання</span>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="copy-toggle" checked onchange="toggleAutoCopy(this)" class="sr-only peer">
+                    <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                </label>
+            </div>
+        </div>
+    </section>
+
+    <!-- НАВІГАЦІЯ ПО ВКЛАДКАХ -->
+    <nav class="flex border-b border-gray-800 text-xs font-bold text-gray-400">
+        <button onclick="switchTab('whales')" id="tab-whales-btn" class="flex-1 py-3 text-center border-b-2 border-emerald-400 text-white flex items-center justify-center gap-1.5 transition-all">
+            <i class="fa-solid fa-users-viewfinder"></i> Топ-Кити
+        </button>
+        <button onclick="switchTab('radar')" id="tab-radar-btn" class="flex-1 py-3 text-center border-b-2 border-transparent hover:text-gray-200 flex items-center justify-center gap-1.5 transition-all">
+            <i class="fa-solid fa-bolt-lightning text-amber-400"></i> AI Радар
+        </button>
+        <button onclick="switchTab('positions')" id="tab-positions-btn" class="flex-1 py-3 text-center border-b-2 border-transparent hover:text-gray-200 flex items-center justify-center gap-1.5 transition-all">
+            <i class="fa-solid fa-chart-line text-cyan-400"></i> Портфель (<span id="open-trades-count">2</span>)
+        </button>
+    </nav>
+
+    <!-- КОНТЕНТ ВКЛАДОК -->
+    <main class="flex-1 overflow-y-auto custom-scroll p-4 space-y-3">
+
+        <!-- ВКЛАДКА 1: КИТИ -->
+        <div id="tab-whales" class="space-y-3">
+            <div class="text-[11px] text-gray-400 flex justify-between items-center px-1">
+                <span>МОНІТОРИНГ УСПІШНИХ ГАМАНЦІВ (7 ДНІВ)</span>
+                <span class="text-emerald-400 font-semibold cursor-pointer" onclick="showToast('Дані оновлено!')"><i class="fa-solid fa-rotate-right"></i> Оновити</span>
+            </div>
+
+            <!-- Кит 1 -->
+            <div class="p-3.5 bg-brandCard rounded-xl border border-gray-800 flex justify-between items-center shadow">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">
+                        🐋
+                    </div>
+                    <div>
+                        <div class="text-sm font-bold flex items-center gap-1.5">
+                            Alpha_Insider <span class="text-[10px] text-gray-500">7xKX...gAsU</span>
+                        </div>
+                        <div class="text-[11px] text-gray-400">
+                            Winrate: <span class="text-emerald-400 font-bold">89%</span> • PnL: <span class="text-emerald-400 font-bold">+342 SOL</span>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="toggleFollow(this, 'Alpha_Insider')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 active:scale-95 transition-all">
+                    ✓ Копіюється
+                </button>
+            </div>
+
+            <!-- Кит 2 -->
+            <div class="p-3.5 bg-brandCard rounded-xl border border-gray-800 flex justify-between items-center shadow">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-sm">
+                        🎯
+                    </div>
+                    <div>
+                        <div class="text-sm font-bold flex items-center gap-1.5">
+                            PumpDev_Hunter <span class="text-[10px] text-gray-500">3k8g...fG8h</span>
+                        </div>
+                        <div class="text-[11px] text-gray-400">
+                            Winrate: <span class="text-emerald-400 font-bold">78%</span> • PnL: <span class="text-emerald-400 font-bold">+189 SOL</span>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="toggleFollow(this, 'PumpDev_Hunter')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 active:scale-95 transition-all">
+                    + Копіювати
+                </button>
+            </div>
+
+            <!-- Кит 3 -->
+            <div class="p-3.5 bg-brandCard rounded-xl border border-gray-800 flex justify-between items-center shadow">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-sm">
+                        ⚡
+                    </div>
+                    <div>
+                        <div class="text-sm font-bold flex items-center gap-1.5">
+                            SolSniper_0x <span class="text-[10px] text-gray-500">9xV2...76xW</span>
+                        </div>
+                        <div class="text-[11px] text-gray-400">
+                            Winrate: <span class="text-emerald-400 font-bold">72%</span> • PnL: <span class="text-emerald-400 font-bold">+94 SOL</span>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="toggleFollow(this, 'SolSniper_0x')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 active:scale-95 transition-all">
+                    + Копіювати
+                </button>
+            </div>
+        </div>
+
+        <!-- ВКЛАДКА 2: РАДАР (PUMP.FUN & AI SCORE) -->
+        <div id="tab-radar" class="space-y-3 hidden">
+            <div class="text-[11px] text-gray-400 flex justify-between items-center px-1">
+                <span>СВІЖІ ТОКЕНИ З ПЕРЕВІРКОЮ НЕЙРОМЕРЕЖІ</span>
+                <span class="text-emerald-400 font-semibold"><i class="fa-solid fa-satellite-dish animate-spin"></i> Стрім онлайн</span>
+            </div>
+
+            <!-- Токен 1 -->
+            <div class="p-3.5 bg-brandCard rounded-xl border border-gray-800 space-y-2">
+                <div class="flex justify-between items-start">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-yellow-500/20 text-yellow-400 flex items-center justify-center font-bold text-xs">
+                            🐶
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold flex items-center gap-1">
+                                $NEO_DOGE <span class="text-[10px] bg-gray-800 px-1.5 py-0.5 rounded text-gray-400">Pump.fun</span>
+                            </div>
+                            <div class="text-[11px] text-gray-400">Створено 4 хв тому • Liq: 28 SOL</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                            AI Score: 94/100
+                        </span>
+                    </div>
+                </div>
+                <div class="pt-2 border-t border-gray-800 flex justify-between items-center text-xs">
+                    <span class="text-gray-400">3 кити вже зайшли</span>
+                    <button onclick="executeQuickBuy('$NEO_DOGE')" class="bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold px-3 py-1 rounded-lg text-xs active:scale-95 transition-all">
+                        Снайпнути 0.1 SOL
+                    </button>
+                </div>
+            </div>
+
+            <!-- Токен 2 -->
+            <div class="p-3.5 bg-brandCard rounded-xl border border-gray-800 space-y-2">
+                <div class="flex justify-between items-start">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-pink-500/20 text-pink-400 flex items-center justify-center font-bold text-xs">
+                            🚀
+                        </div>
+                        <div>
+                            <div class="text-sm font-bold flex items-center gap-1">
+                                $SOL_AI_CAT <span class="text-[10px] bg-gray-800 px-1.5 py-0.5 rounded text-gray-400">Pump.fun</span>
+                            </div>
+                            <div class="text-[11px] text-gray-400">Створено 9 хв тому • Liq: 45 SOL</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                            AI Score: 88/100
+                        </span>
+                    </div>
+                </div>
+                <div class="pt-2 border-t border-gray-800 flex justify-between items-center text-xs">
+                    <span class="text-gray-400">Дев спалив 100% LP</span>
+                    <button onclick="executeQuickBuy('$SOL_AI_CAT')" class="bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold px-3 py-1 rounded-lg text-xs active:scale-95 transition-all">
+                        Снайпнути 0.1 SOL
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ВКЛАДКА 3: ПОРТФЕЛЬ -->
+        <div id="tab-positions" class="space-y-3 hidden">
+            <div class="text-[11px] text-gray-400 flex justify-between items-center px-1">
+                <span>АКТИВНІ УГОДИ АВТО-КОПІЮВАННЯ</span>
+                <span class="text-emerald-400 font-semibold cursor-pointer">Всі в плюсі</span>
+            </div>
+
+            <!-- Позиція 1 -->
+            <div class="p-3.5 bg-brandCard rounded-xl border border-gray-800 flex justify-between items-center">
+                <div>
+                    <div class="text-sm font-bold flex items-center gap-1.5">
+                        $DARK_PEPE <span class="text-[10px] text-emerald-400 font-semibold">+145%</span>
+                    </div>
+                    <div class="text-[11px] text-gray-400">Вхід: 0.1 SOL • Зараз: 0.245 SOL</div>
+                </div>
+                <button onclick="closeTrade(this, '$DARK_PEPE', 0.245)" class="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/40 text-xs font-bold px-3 py-1.5 rounded-lg active:scale-95 transition-all">
+                    Продати (Тейк)
+                </button>
+            </div>
+
+            <!-- Позиція 2 -->
+            <div class="p-3.5 bg-brandCard rounded-xl border border-gray-800 flex justify-between items-center">
+                <div>
+                    <div class="text-sm font-bold flex items-center gap-1.5">
+                        $CAT_WIF_SOL <span class="text-[10px] text-emerald-400 font-semibold">+32%</span>
+                    </div>
+                    <div class="text-[11px] text-gray-400">Вхід: 0.1 SOL • Зараз: 0.132 SOL</div>
+                </div>
+                <button onclick="closeTrade(this, '$CAT_WIF_SOL', 0.132)" class="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/40 text-xs font-bold px-3 py-1.5 rounded-lg active:scale-95 transition-all">
+                    Продати (Тейк)
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- НИЖНЯ ПАНЕЛЬ НАЛАШТУВАНЬ -->
+    <footer class="p-3 bg-brandCard border-t border-gray-800 flex justify-around text-[10px] text-gray-400 font-semibold">
+        <div class="flex items-center gap-1">
+            <i class="fa-solid fa-sliders text-emerald-400"></i> Сума ордера: <span class="text-white">0.1 SOL</span>
+        </div>
+        <div class="flex items-center gap-1">
+            <i class="fa-solid fa-shield-halved text-cyan-400"></i> Slippage: <span class="text-white">10%</span>
+        </div>
+        <div class="flex items-center gap-1">
+            <i class="fa-solid fa-crown text-amber-400"></i> План: <span class="text-emerald-400 font-bold">VIP Lifetime</span>
+        </div>
+    </footer>
+
+    <!-- МОДАЛКА ДЕПОЗИТУ -->
+    <div id="deposit-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-brandCard border border-gray-800 w-full max-w-sm rounded-2xl p-5 space-y-4">
+            <div class="flex justify-between items-center">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-qrcode text-emerald-400"></i> Депозит на робота
+                </h3>
+                <button onclick="toggleModal('deposit-modal')" class="text-gray-400 hover:text-white text-lg">✕</button>
+            </div>
+            <p class="text-xs text-gray-400">
+                Надішліть SOL на свій торговий субрахунок для початку авто-копіювання угод:
+            </p>
+            <div class="bg-brandDark p-3 rounded-xl border border-gray-800 flex justify-between items-center text-xs">
+                <span class="font-mono text-gray-300 truncate mr-2" id="deposit-address">9xV2pA4bC5dE7fG8h3k8gB6c7P3hQyLq9xM1k9ZfT6xW</span>
+                <button onclick="copyAddress()" class="text-emerald-400 font-bold hover:underline shrink-0">
+                    <i class="fa-regular fa-copy"></i> Скопіювати
+                </button>
+            </div>
+            <div class="text-[11px] text-gray-500">
+                Мінімальний депозит: 0.1 SOL. Кошти доступні до виведення в будь-який момент.
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST ПОВІДОМЛЕННЯ -->
+    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-emerald-500 text-black px-4 py-2 rounded-xl text-xs font-bold shadow-2xl opacity-0 pointer-events-none transition-all duration-300 z-50">
+        Сповіщення
+    </div>
+
+    <script>
+        // Ініціалізація Telegram WebApp
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.ready();
+            window.Telegram.WebApp.expand();
+        }
+
+        function switchTab(tab) {
+            ['whales', 'radar', 'positions'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}-btn`).classList.remove('border-emerald-400', 'text-white');
+                document.getElementById(`tab-${t}-btn`).classList.add('border-transparent');
+            });
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}-btn`).classList.add('border-emerald-400', 'text-white');
+            document.getElementById(`tab-${tab}-btn`).classList.remove('border-transparent');
+        }
+
+        function toggleModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.toggle('hidden');
+        }
+
+        function showToast(text) {
+            const toast = document.getElementById('toast');
+            toast.innerText = text;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 2000);
+        }
+
+        function copyAddress() {
+            const addr = document.getElementById('deposit-address').innerText;
+            navigator.clipboard.writeText(addr);
+            showToast('Адресу успішно скопійовано!');
+        }
+
+        function toggleAutoCopy(el) {
+            if (el.checked) {
+                showToast('Авто-копіювання китів УВІМКНЕНО');
+            } else {
+                showToast('Авто-копіювання ПРИЗУПИНЕНО');
+            }
+        }
+
+        function toggleFollow(btn, name) {
+            if (btn.innerText.includes('Копіюється')) {
+                btn.innerText = '+ Копіювати';
+                btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 active:scale-95 transition-all';
+                showToast(`Відключено від ${name}`);
+            } else {
+                btn.innerText = '✓ Копіюється';
+                btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 active:scale-95 transition-all';
+                showToast(`Підключено копіювання: ${name}`);
+            }
+        }
+
+        function executeQuickBuy(token) {
+            showToast(`Снайпнуто ${token} на 0.1 SOL!`);
+        }
+
+        function closeTrade(btn, token, amount) {
+            btn.parentElement.remove();
+            showToast(`Продано ${token}: +${amount} SOL додано до балансу`);
+        }
+    </script>
+</body>
+</html>
