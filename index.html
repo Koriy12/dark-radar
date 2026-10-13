@@ -311,11 +311,39 @@
     </div>
 
     <script>
-        // Ініціалізація Telegram WebApp
-        if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.ready();
-            window.Telegram.WebApp.expand();
+       const API_BASE_URL = 'https://six-cats-accept.loca.lt';
+
+    // Ініціалізація Telegram WebApp
+    if (window.Telegram && window.Telegram.WebApp) {
+      window.Telegram.WebApp.ready();
+      window.Telegram.WebApp.expand();
+      
+      const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
+      const tgId = tgUser ? tgUser.id : 'demo_user_123';
+
+      // Отримання гаманця з твого бекенду
+      fetch(`${API_BASE_URL}/api/wallet/init`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ telegramId: String(tgId) })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.publicKey) {
+          const addrElem = document.getElementById('deposit-address');
+          if (addrElem) addrElem.innerText = data.publicKey;
+          
+          fetch(`${API_BASE_URL}/api/wallet/balance/${data.publicKey}`)
+            .then(r => r.json())
+            .then(bal => {
+              if (bal.balanceSol !== undefined) {
+                document.getElementById('user-balance').innerText = bal.balanceSol;
+              }
+            });
         }
+      })
+      .catch(err => console.log('Backend sync error:', err));
+    }
 
         function switchTab(tab) {
             ['whales', 'radar', 'positions'].forEach(t => {
