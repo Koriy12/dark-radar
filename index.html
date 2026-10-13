@@ -502,7 +502,7 @@
           if (data.referralsCount !== undefined) {
             document.getElementById('ref-count').innerText = data.referralsCount;
             document.getElementById('ref-earned').innerText = data.totalEarnedSol;
-            const refUrl = `https://t.me/darksolradar_bot?startapp=ref_${currentTelegramId}`;
+            const refUrl = `https://t.me/darksolradar_bot/app?startapp=ref_${currentTelegramId}`;
             document.getElementById('ref-link-text').innerText = refUrl;
           }
         })
@@ -592,17 +592,23 @@
         currentTelegramId = tgUser.id;
       }
 
-      // Універсальне зчитування refId з усіх форматів Telegram
+     // Зчитування реферального параметра
       const urlParams = new URLSearchParams(window.location.search);
-      const rawStartParam = window.Telegram.WebApp.initDataUnsafe?.start_param 
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      
+      const rawStartParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param 
         || urlParams.get('tgWebAppStartParam') 
         || urlParams.get('startapp') 
-        || urlParams.get('start') 
+        || hashParams.get('tgWebAppStartParam')
         || '';
 
       let refId = null;
-      if (rawStartParam && rawStartParam.includes('ref_')) {
-        refId = rawStartParam.split('ref_')[1].split('&')[0];
+      if (rawStartParam) {
+        if (rawStartParam.startsWith('ref_')) {
+          refId = rawStartParam.replace('ref_', '').split('&')[0];
+        } else {
+          refId = rawStartParam.split('&')[0];
+        }
       }
 
       fetch(`${API_BASE_URL}/api/wallet/init`, {
