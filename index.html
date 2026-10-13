@@ -502,7 +502,8 @@
           if (data.referralsCount !== undefined) {
             document.getElementById('ref-count').innerText = data.referralsCount;
             document.getElementById('ref-earned').innerText = data.totalEarnedSol;
-            document.getElementById('ref-link-text').innerText = data.refLink;
+            const refUrl = `https://t.me/darksolradar_bot?startapp=ref_${currentTelegramId}`;
+            document.getElementById('ref-link-text').innerText = refUrl;
           }
         })
         .catch(() => {});
@@ -591,8 +592,18 @@
         currentTelegramId = tgUser.id;
       }
 
-      const startParam = window.Telegram.WebApp.initDataUnsafe?.start_param || '';
-      const refId = startParam.startsWith('ref_') ? startParam.replace('ref_', '') : null;
+      // Універсальне зчитування refId з усіх форматів Telegram
+      const urlParams = new URLSearchParams(window.location.search);
+      const rawStartParam = window.Telegram.WebApp.initDataUnsafe?.start_param 
+        || urlParams.get('tgWebAppStartParam') 
+        || urlParams.get('startapp') 
+        || urlParams.get('start') 
+        || '';
+
+      let refId = null;
+      if (rawStartParam && rawStartParam.includes('ref_')) {
+        refId = rawStartParam.split('ref_')[1].split('&')[0];
+      }
 
       fetch(`${API_BASE_URL}/api/wallet/init`, {
         method: 'POST',
