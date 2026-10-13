@@ -215,7 +215,7 @@
   </div>
 
   <script>
-    const API_BASE_URL = 'https://six-cats-accept.loca.lt';
+    const API_BASE_URL = 'https://dark-radar-api.onrender.com';
 
     if (window.Telegram && window.Telegram.WebApp) {
       window.Telegram.WebApp.ready();
@@ -226,19 +226,14 @@
 
       fetch(`${API_BASE_URL}/api/wallet/init`, {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Bypass-Tunnel-Reminder': 'true'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ telegramId: String(tgId) })
       })
       .then(res => res.json())
       .then(data => {
         if (data.publicKey) {
           document.getElementById('deposit-address').innerText = data.publicKey;
-          fetch(`${API_BASE_URL}/api/wallet/balance/${data.publicKey}`, {
-            headers: { 'Bypass-Tunnel-Reminder': 'true' }
-          })
+          fetch(`${API_BASE_URL}/api/wallet/balance/${data.publicKey}`)
           .then(r => r.json())
           .then(bal => {
             if (bal.balanceSol !== undefined) {
