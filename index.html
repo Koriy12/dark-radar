@@ -290,7 +290,44 @@
     }
 
     function executeQuickBuy(token) {
-      showToast(`Снайпнуто ${token} на 0.1 SOL!`);
+      const balanceElem = document.getElementById('user-balance');
+      const currentBal = parseFloat(balanceElem ? balanceElem.innerText : '0');
+
+      if (currentBal < 0.1) {
+        showToast('Помилка: недостатньо коштів! Поповніть баланс.');
+        toggleModal('deposit-modal');
+        return;
+      }
+
+      showToast(`Снайпінг ${token}... Відправка ордера`);
+
+      const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+      const tgId = tgUser ? tgUser.id : 'demo_user_123';
+
+      fetch(`${API_BASE_URL}/api/trade/pump`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          telegramId: String(tgId),
+          mint: "CzLSujWBLFsSjncfkh59rQDqJgCSwBuWXV5GH98pump", // Контракт токена
+          action: "buy",
+          amountSol: 0.1
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          showToast(`Успішно куплено! TX: ${data.txHash.slice(0, 8)}...`);
+          // Оновлюємо кількість угод у вкладці портфеля
+          const countElem = document.getElementById('open-trades-count');
+          if (countElem) countElem.innerText = parseInt(countElem.innerText || '0') + 1;
+        } else {
+          showToast(`Помилка: ${data.error || 'Не вдалося виконати ордер'}`);
+        }
+      })
+      .catch(err => {
+        showToast('Помилка з\'єднання з сервером');
+      });
     }
 
     function closeTrade(btn, token, amount) {
