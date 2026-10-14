@@ -79,7 +79,7 @@
       </div>
     </div>
 
-    <!-- Селектор розміру ордера -->
+    <!-- Селектор швидкої ставки -->
     <div class="dark-card rounded-xl p-2.5 flex items-center justify-between">
       <span class="text-xs text-gray-400 font-medium pl-1">Розмір ордера:</span>
       <div class="flex gap-1.5 font-mono text-xs" id="amount-presets">
@@ -210,11 +210,11 @@
       <div class="space-y-3 mb-4">
         <div>
           <label class="text-[11px] text-gray-400 block mb-1">Take-Profit (+ % профіту)</label>
-          <input type="number" id="limit-tp" placeholder="Наприклад: 50 (+50%)" class="w-full bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-xs font-mono text-emerald-400 focus:outline-none focus:border-emerald-500">
+          <input type="number" id="limit-tp" placeholder="50 (+50%)" class="w-full bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-xs font-mono text-emerald-400 focus:outline-none focus:border-emerald-500">
         </div>
         <div>
           <label class="text-[11px] text-gray-400 block mb-1">Stop-Loss (- % збитку)</label>
-          <input type="number" id="limit-sl" placeholder="Наприклад: 20 (-20%)" class="w-full bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-xs font-mono text-red-400 focus:outline-none focus:border-red-500">
+          <input type="number" id="limit-sl" placeholder="20 (-20%)" class="w-full bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-xs font-mono text-red-400 focus:outline-none focus:border-red-500">
         </div>
       </div>
       <button onclick="saveLimits()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs py-2.5 rounded-xl transition">
@@ -359,7 +359,7 @@
         tokenPriceCache[mint] = { time: Date.now(), data };
         return data;
       } catch (e) {
-        return { priceSol: 0.000000032 };
+        return { priceSol: 0.000000030 };
       }
     }
 
@@ -373,16 +373,14 @@
       container.innerHTML = '';
       for (const tr of portfolioTrades) {
         const remainingSol = parseFloat(tr.remaining_amount_sol);
-        const entryPrice = parseFloat(tr.entry_price_sol || 0.000000032);
+        const entryPrice = parseFloat(tr.entry_price_sol || 0.000000030);
         const liveData = await fetchLiveTokenData(tr.mint);
         const currentPrice = parseFloat(liveData.priceSol || entryPrice);
 
-        // Чесний розрахунок біржового PnL
         const pnlPct = ((currentPrice - entryPrice) / entryPrice) * 100;
         const isProfit = pnlPct >= 0;
         const currentValSol = (remainingSol * (currentPrice / entryPrice)).toFixed(4);
 
-        // Авто-закриття TP / SL
         if (tr.take_profit_pct && pnlPct >= tr.take_profit_pct) {
           showToast(`🎯 Тейк-профіт +${pnlPct.toFixed(1)}% спрацював на ${tr.token_name}!`);
           executeSell(tr.id, tr.mint, 100, currentPrice);
@@ -410,9 +408,11 @@
               </div>
             </div>
             
-            <!-- Прямі лінки на графіки -->
             <div class="flex items-center gap-1">
-              <a href="https://dexscreener.com/solana/${tr.mint}" target="_blank" class="bg-gray-800 hover:bg-gray-700 text-cyan-400 border border-gray-700 text-[10px] px-2 py-1 rounded-lg font-mono">
+              <a href="https://axiom.trade/meme/${tr.mint}" target="_blank" class="bg-gray-800 hover:bg-gray-700 text-cyan-400 border border-gray-700 text-[10px] px-2 py-1 rounded-lg font-mono">
+                Axiom
+              </a>
+              <a href="https://dexscreener.com/solana/${tr.mint}" target="_blank" class="bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 text-[10px] px-2 py-1 rounded-lg font-mono">
                 DEX
               </a>
               <a href="https://pump.fun/coin/${tr.mint}" target="_blank" class="bg-gray-800 hover:bg-gray-700 text-emerald-400 border border-gray-700 text-[10px] px-2 py-1 rounded-lg font-mono">
@@ -424,7 +424,6 @@
             </div>
           </div>
 
-          <!-- Частковий або повний продаж -->
           <div class="grid grid-cols-4 gap-1.5 pt-2 border-t border-gray-800/60 font-mono text-xs">
             <button onclick="executeSell(${tr.id}, '${tr.mint}', 25, ${currentPrice})" class="bg-gray-800 hover:bg-gray-700 text-gray-200 py-1.5 rounded-lg border border-gray-700 font-bold transition">
               25%
@@ -694,7 +693,7 @@
       });
     }
 
-    // Запуск WebApp
+    // Ініціалізація WebApp
     if (window.Telegram && window.Telegram.WebApp) {
       window.Telegram.WebApp.ready();
       window.Telegram.WebApp.expand();
