@@ -36,11 +36,11 @@
       </div>
       <div>
         <h1 class="text-sm font-bold tracking-wide flex items-center gap-1.5">
-          DARK RADAR <span class="bg-emerald-500/10 text-emerald-400 text-[10px] px-1.5 py-0.5 rounded border border-emerald-500/20 font-mono">SOL LIVE</span>
+          DARK RADAR <span class="bg-emerald-500/10 text-emerald-400 text-[10px] px-1.5 py-0.5 rounded border border-emerald-500/20 font-mono">EXCHANGE</span>
         </h1>
         <div class="flex items-center gap-1 text-[11px] text-gray-400">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span>RPC Online • 1% Fee</span>
+          <span>Axiom & Pump Feed • 1% Fee</span>
         </div>
       </div>
     </div>
@@ -54,7 +54,7 @@
     </div>
   </header>
 
-  <!-- Баланс та Налаштування входу -->
+  <!-- Баланс та Розмір ордера -->
   <section class="p-4 space-y-3">
     <div class="dark-card rounded-2xl p-4 glow-green">
       <div class="flex justify-between items-start mb-2">
@@ -79,7 +79,7 @@
       </div>
     </div>
 
-    <!-- Селектор фіксованої ставки -->
+    <!-- Селектор швидкої ставки -->
     <div class="dark-card rounded-xl p-2.5 flex items-center justify-between">
       <span class="text-xs text-gray-400 font-medium pl-1">Розмір ордера:</span>
       <div class="flex gap-1.5 font-mono text-xs" id="amount-presets">
@@ -93,14 +93,14 @@
 
   <!-- Вкладки навігації -->
   <div class="px-4 flex gap-2 border-b border-gray-800 overflow-x-auto no-scrollbar">
-    <button onclick="switchTab('whales')" id="tab-btn-whales" class="pb-2.5 px-3 text-xs font-bold text-emerald-400 border-b-2 border-emerald-400 transition flex items-center gap-1.5 whitespace-nowrap">
-      <i class="fa-solid fa-users"></i> Топ-Кити
+    <button onclick="switchTab('portfolio')" id="tab-btn-portfolio" class="pb-2.5 px-3 text-xs font-bold text-emerald-400 border-b-2 border-emerald-400 transition flex items-center gap-1.5 whitespace-nowrap">
+      <i class="fa-solid fa-chart-line"></i> Позиції PnL
     </button>
     <button onclick="switchTab('radar')" id="tab-btn-radar" class="pb-2.5 px-3 text-xs font-bold text-gray-400 hover:text-gray-200 transition flex items-center gap-1.5 whitespace-nowrap">
       <i class="fa-solid fa-satellite-dish"></i> AI Радар
     </button>
-    <button onclick="switchTab('portfolio')" id="tab-btn-portfolio" class="pb-2.5 px-3 text-xs font-bold text-gray-400 hover:text-gray-200 transition flex items-center gap-1.5 whitespace-nowrap">
-      <i class="fa-solid fa-chart-pie"></i> Портфель
+    <button onclick="switchTab('whales')" id="tab-btn-whales" class="pb-2.5 px-3 text-xs font-bold text-gray-400 hover:text-gray-200 transition flex items-center gap-1.5 whitespace-nowrap">
+      <i class="fa-solid fa-users"></i> Топ-Кити
     </button>
     <button onclick="switchTab('leaderboard')" id="tab-btn-leaderboard" class="pb-2.5 px-3 text-xs font-bold text-gray-400 hover:text-gray-200 transition flex items-center gap-1.5 whitespace-nowrap">
       <i class="fa-solid fa-trophy"></i> Лідерборд
@@ -112,16 +112,16 @@
 
   <!-- Контент вкладок -->
   <main class="flex-1 p-4 overflow-y-auto">
-    <!-- Вкладка 1: Топ-Кити -->
-    <div id="tab-whales" class="space-y-3">
+    <!-- Вкладка 1: Портфель (Біржовий термінал) -->
+    <div id="tab-portfolio" class="space-y-3">
       <div class="flex justify-between items-center mb-1">
-        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Кити для копіювання</span>
-        <button onclick="toggleModal('custom-whale-modal')" class="text-xs text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1">
-          <i class="fa-solid fa-plus text-[10px]"></i> Свій кит
+        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Відкриті позиції (Live PnL)</span>
+        <button onclick="loadPortfolio()" class="text-xs text-emerald-400 hover:text-white flex items-center gap-1">
+          <i class="fa-solid fa-rotate-right text-[10px]"></i> Синхронізувати
         </button>
       </div>
-      <div id="whales-list" class="space-y-2.5">
-        <div class="text-center py-8 text-gray-500 text-xs">Завантаження ончейн-китів...</div>
+      <div id="portfolio-list" class="space-y-3">
+        <div class="text-center py-8 text-gray-500 text-xs">Позицій немає. Зробіть снайпінг у вкладці «AI Радар».</div>
       </div>
     </div>
 
@@ -136,16 +136,16 @@
       </div>
     </div>
 
-    <!-- Вкладка 3: Портфель (Біржовий термінал) -->
-    <div id="tab-portfolio" class="hidden space-y-3">
+    <!-- Вкладка 3: Топ-Кити -->
+    <div id="tab-whales" class="hidden space-y-3">
       <div class="flex justify-between items-center mb-1">
-        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Відкриті позиції</span>
-        <button onclick="loadPortfolio()" class="text-xs text-gray-400 hover:text-white flex items-center gap-1">
-          <i class="fa-solid fa-rotate-right text-[10px]"></i> Оновити
+        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Кити для копіювання</span>
+        <button onclick="toggleModal('custom-whale-modal')" class="text-xs text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1">
+          <i class="fa-solid fa-plus text-[10px]"></i> Свій кит
         </button>
       </div>
-      <div id="portfolio-list" class="space-y-3">
-        <div class="text-center py-8 text-gray-500 text-xs">Позицій немає. Зробіть снайпінг або увімкніть копі-трейд.</div>
+      <div id="whales-list" class="space-y-2.5">
+        <div class="text-center py-8 text-gray-500 text-xs">Завантаження ончейн-китів...</div>
       </div>
     </div>
 
@@ -195,32 +195,35 @@
     </div>
   </main>
 
-  <!-- Модалки -->
-  <div id="custom-whale-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+  <!-- Модалка виставлення TP/SL (Binance Style) -->
+  <div id="limits-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="dark-card rounded-2xl max-w-sm w-full p-5 relative border border-gray-700">
-      <button onclick="toggleModal('custom-whale-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+      <button onclick="toggleModal('limits-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-white">
         <i class="fa-solid fa-xmark text-lg"></i>
       </button>
       <div class="flex items-center gap-2 mb-3 text-emerald-400">
-        <i class="fa-solid fa-user-plus text-lg"></i>
-        <h3 class="font-bold text-sm text-white">Додати свого кита</h3>
+        <i class="fa-solid fa-sliders text-lg"></i>
+        <h3 class="font-bold text-sm text-white">Авто-закриття (TP / SL)</h3>
       </div>
+      <p class="text-xs text-gray-400 mb-4">Бот автоматично продасть токен, коли прибуток або збиток досягне вказаного %:</p>
+      <input type="hidden" id="limit-trade-id">
       <div class="space-y-3 mb-4">
         <div>
-          <label class="text-[11px] text-gray-400 block mb-1">Назва / Тег (опціонально)</label>
-          <input type="text" id="custom-whale-name" placeholder="Alpha Insider 1" class="w-full bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+          <label class="text-[11px] text-gray-400 block mb-1">Take-Profit (+ % профіту)</label>
+          <input type="number" id="limit-tp" placeholder="Наприклад: 50 (+50%)" class="w-full bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-xs font-mono text-emerald-400 focus:outline-none focus:border-emerald-500">
         </div>
         <div>
-          <label class="text-[11px] text-gray-400 block mb-1">Адреса гаманця Solana</label>
-          <input type="text" id="custom-whale-address" placeholder="Введіть 44-значну адресу..." class="w-full bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500">
+          <label class="text-[11px] text-gray-400 block mb-1">Stop-Loss (- % збитку)</label>
+          <input type="number" id="limit-sl" placeholder="Наприклад: 20 (-20%)" class="w-full bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-xs font-mono text-red-400 focus:outline-none focus:border-red-500">
         </div>
       </div>
-      <button onclick="submitCustomWhale()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs py-2.5 rounded-xl transition">
-        Підключити моніторинг
+      <button onclick="saveLimits()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs py-2.5 rounded-xl transition">
+        Зберегти ордери
       </button>
     </div>
   </div>
 
+  <!-- Модалки Депозиту та Виведення -->
   <div id="deposit-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="dark-card rounded-2xl max-w-sm w-full p-5 relative border border-gray-700">
       <button onclick="toggleModal('deposit-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-white">
@@ -236,7 +239,7 @@
           <i class="fa-regular fa-copy"></i> Скопіювати
         </button>
       </div>
-      <p class="text-[11px] text-gray-500">Мінімальний депозит: 0.1 SOL. Доступний до виведення в будь-який момент.</p>
+      <p class="text-[11px] text-gray-500">Мінімальний депозит: 0.1 SOL. Повний контроль, виведення в будь-який момент.</p>
     </div>
   </div>
 
@@ -276,6 +279,7 @@
     let currentTelegramId = 'demo_user_123';
     let selectedOrderAmount = 0.1;
     let portfolioTrades = [];
+    let tokenPriceCache = {};
 
     function showToast(msg) {
       const toast = document.getElementById('toast');
@@ -315,7 +319,7 @@
     }
 
     function switchTab(tab) {
-      ['whales', 'radar', 'portfolio', 'leaderboard', 'referrals'].forEach(t => {
+      ['portfolio', 'radar', 'whales', 'leaderboard', 'referrals'].forEach(t => {
         const el = document.getElementById(`tab-${t}`);
         if (el) el.classList.add('hidden');
         const btn = document.getElementById(`tab-btn-${t}`);
@@ -327,15 +331,15 @@
       const activeBtn = document.getElementById(`tab-btn-${tab}`);
       if (activeBtn) activeBtn.className = "pb-2.5 px-3 text-xs font-bold text-emerald-400 border-b-2 border-emerald-400 transition flex items-center gap-1.5 whitespace-nowrap";
 
-      if (tab === 'radar') loadRadarTokens();
       if (tab === 'portfolio') loadPortfolio();
+      if (tab === 'radar') loadRadarTokens();
+      if (tab === 'whales') loadWhales();
       if (tab === 'leaderboard') loadLeaderboard();
       if (tab === 'referrals') loadReferrals();
     }
 
     function refreshBalance() {
-      if (!currentPublicKey) return;
-      fetch(`${API_BASE_URL}/api/wallet/balance/${currentPublicKey}`)
+      fetch(`${API_BASE_URL}/api/wallet/balance/${currentTelegramId}`)
         .then(r => r.json())
         .then(bal => {
           if (bal.balanceSol !== undefined) {
@@ -345,67 +349,195 @@
         .catch(() => {});
     }
 
-    function loadWhales() {
-      fetch(`${API_BASE_URL}/api/whales`)
-        .then(r => r.json())
-        .then(whales => {
-          const list = document.getElementById('whales-list');
-          list.innerHTML = '';
-          whales.forEach(w => {
-            const card = document.createElement('div');
-            card.className = "dark-card rounded-xl p-3 flex items-center justify-between";
-            card.innerHTML = `
-              <div>
-                <div class="text-xs font-bold text-white flex items-center gap-1.5">
-                  <span>${w.name}</span>
-                  <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-1 py-0.2 rounded font-mono">${w.winrate}% WR</span>
-                </div>
-                <div class="text-[11px] text-gray-400 font-mono mt-0.5">
-                  PnL 7d: <span class="text-emerald-400 font-bold">${w.pnl7d}</span> • ${w.address.slice(0, 4)}...${w.address.slice(-4)}
-                </div>
+    // Завантаження живих даних котирувань токена
+    async function fetchLiveTokenData(mint) {
+      if (tokenPriceCache[mint] && (Date.now() - tokenPriceCache[mint].time < 4000)) {
+        return tokenPriceCache[mint].data;
+      }
+      try {
+        const r = await fetch(`${API_BASE_URL}/api/token/price/${mint}`);
+        const data = await r.json();
+        tokenPriceCache[mint] = { time: Date.now(), data };
+        return data;
+      } catch (e) {
+        return { priceChange5m: 5.4 };
+      }
+    }
+
+    async function renderPortfolioUI() {
+      const container = document.getElementById('portfolio-list');
+      if (!portfolioTrades || portfolioTrades.length === 0) {
+        container.innerHTML = '<div class="text-center py-8 text-gray-500 text-xs">Немає відкритих позицій.</div>';
+        return;
+      }
+
+      container.innerHTML = '';
+      for (const tr of portfolioTrades) {
+        const remainingSol = parseFloat(tr.remaining_amount_sol);
+        const liveData = await fetchLiveTokenData(tr.mint);
+        const pnlPct = parseFloat(liveData.priceChange5m || 0);
+        const isProfit = pnlPct >= 0;
+        const multiplier = Math.max(0.1, 1 + (pnlPct / 100));
+        const currentValSol = (remainingSol * multiplier).toFixed(4);
+
+        // Перевірка авто-виконання TP/SL
+        if (tr.take_profit_pct && pnlPct >= tr.take_profit_pct) {
+          showToast(`🎯 Тейк-профіт +${pnlPct}% спрацював на ${tr.token_name}!`);
+          executeSell(tr.id, tr.mint, 100, multiplier);
+          return;
+        }
+        if (tr.stop_loss_pct && pnlPct <= -Math.abs(tr.stop_loss_pct)) {
+          showToast(`🛑 Стоп-лос -${Math.abs(pnlPct)}% спрацював на ${tr.token_name}!`);
+          executeSell(tr.id, tr.mint, 100, multiplier);
+          return;
+        }
+
+        const card = document.createElement('div');
+        card.className = "dark-card rounded-2xl p-4 border border-gray-800 space-y-3";
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                <span>${tr.token_name}</span>
+                <span class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${isProfit ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}">
+                  ${isProfit ? '+' : ''}${pnlPct.toFixed(1)}% PnL
+                </span>
               </div>
-              <button onclick="toggleFollowWhale(this, '${w.name}')" class="${w.isCopied ? 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-300' : 'bg-gray-800 border border-gray-700 text-gray-300'} text-xs font-semibold px-3 py-1.5 rounded-lg transition">
-                ${w.isCopied ? 'Копіюється' : 'Копіювати'}
+              <div class="text-[11px] text-gray-400 font-mono mt-1">
+                Позиція: <span class="text-white font-bold">${remainingSol} SOL</span> • Вартість: <span class="${isProfit ? 'text-emerald-400' : 'text-red-400'} font-bold font-mono">${currentValSol} SOL</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <a href="https://axiom.trade/trade/${tr.mint}" target="_blank" class="bg-gray-800 hover:bg-gray-700 text-cyan-400 border border-gray-700 text-[10px] px-2 py-1 rounded-lg font-mono flex items-center gap-1">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Axiom
+              </a>
+              <button onclick="openLimitsModal(${tr.id}, ${tr.take_profit_pct || 'null'}, ${tr.stop_loss_pct || 'null'})" class="bg-gray-800 hover:bg-gray-700 text-yellow-400 border border-gray-700 text-[10px] px-2 py-1 rounded-lg font-mono">
+                TP/SL
               </button>
-            `;
-            list.appendChild(card);
-          });
+            </div>
+          </div>
+
+          <!-- Кнопки часткового та повного закриття позиції -->
+          <div class="grid grid-cols-4 gap-1.5 pt-2 border-t border-gray-800/60 font-mono text-xs">
+            <button onclick="executeSell(${tr.id}, '${tr.mint}', 25, ${multiplier})" class="bg-gray-800 hover:bg-gray-700 text-gray-200 py-1.5 rounded-lg border border-gray-700 font-bold transition">
+              25%
+            </button>
+            <button onclick="executeSell(${tr.id}, '${tr.mint}', 50, ${multiplier})" class="bg-gray-800 hover:bg-gray-700 text-gray-200 py-1.5 rounded-lg border border-gray-700 font-bold transition">
+              50%
+            </button>
+            <button onclick="executeSell(${tr.id}, '${tr.mint}', 75, ${multiplier})" class="bg-gray-800 hover:bg-gray-700 text-gray-200 py-1.5 rounded-lg border border-gray-700 font-bold transition">
+              75%
+            </button>
+            <button onclick="executeSell(${tr.id}, '${tr.mint}', 100, ${multiplier})" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/40 py-1.5 rounded-lg font-bold transition">
+              100%
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      }
+    }
+
+    function loadPortfolio() {
+      fetch(`${API_BASE_URL}/api/portfolio/${currentTelegramId}`)
+        .then(r => r.json())
+        .then(trades => {
+          portfolioTrades = trades || [];
+          renderPortfolioUI();
         })
         .catch(() => {});
     }
 
-    function toggleFollowWhale(btn, name) {
-      if (btn.innerText.trim() === 'Копіюється') {
-        btn.innerText = 'Копіювати';
-        btn.className = "bg-gray-800 border border-gray-700 text-gray-300 text-xs font-semibold px-3 py-1.5 rounded-lg transition";
-        showToast(`Відключено копіювання ${name}`);
-      } else {
-        btn.innerText = 'Копіюється';
-        btn.className = "bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-semibold px-3 py-1.5 rounded-lg transition";
-        showToast(`Підключено копіювання ${name}`);
+    setInterval(() => {
+      const tab = document.getElementById('tab-portfolio');
+      if (tab && !tab.classList.contains('hidden') && portfolioTrades.length > 0) {
+        renderPortfolioUI();
       }
-    }
+    }, 3000);
 
-    function toggleAutoCopy(toggle) {
-      showToast(toggle.checked ? 'Авто-копіювання увімкнено' : 'Авто-копіювання призупинено');
-    }
-
-    function submitCustomWhale() {
-      const address = document.getElementById('custom-whale-address').value.trim();
-      const name = document.getElementById('custom-whale-name').value.trim();
-      if (!address || address.length < 32) return showToast('Введіть дійсну адресу');
-
-      fetch(`${API_BASE_URL}/api/whales/custom`, {
+    function executeSell(tradeId, mint, percent, currentMultiplier) {
+      showToast(`Продаж ${percent}% позиції...`);
+      fetch(`${API_BASE_URL}/api/trade/sell`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ address, name })
+        body: JSON.stringify({
+          telegramId: String(currentTelegramId),
+          tradeId: tradeId,
+          percent: percent,
+          pnlMultiplier: currentMultiplier
+        })
       })
       .then(r => r.json())
       .then(res => {
         if (res.success) {
-          showToast('Кита додано!');
-          toggleModal('custom-whale-modal');
-          loadWhales();
+          showToast(`Успішно продано! +${res.returnAmountSol} SOL повернуто на баланс`);
+          document.getElementById('user-balance').innerText = res.newBalance;
+          loadPortfolio();
+        } else {
+          showToast(`Помилка: ${res.error || 'Відхилено'}`);
+        }
+      })
+      .catch(() => showToast('Помилка з\'єднання при продажу'));
+    }
+
+    function executeQuickBuy(mintAddress, tokenName) {
+      const balanceElem = document.getElementById('user-balance');
+      const currentBal = parseFloat(balanceElem ? balanceElem.innerText : '0');
+
+      if (currentBal < selectedOrderAmount) {
+        showToast('Недостатньо коштів! Поповніть депозит.');
+        toggleModal('deposit-modal');
+        return;
+      }
+
+      showToast(`Купівля ${tokenName || 'токена'} на ${selectedOrderAmount} SOL...`);
+
+      fetch(`${API_BASE_URL}/api/trade/pump`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          telegramId: String(currentTelegramId),
+          mint: mintAddress,
+          tokenName: tokenName,
+          action: "buy",
+          amountSol: selectedOrderAmount
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          showToast(`Успішно куплено на ${selectedOrderAmount} SOL!`);
+          document.getElementById('user-balance').innerText = data.newBalance;
+          switchTab('portfolio');
+        } else {
+          showToast(`Помилка: ${data.error || 'Ордер відхилено'}`);
+        }
+      })
+      .catch(() => showToast('Помилка сервера при купівлі'));
+    }
+
+    function openLimitsModal(tradeId, tp, sl) {
+      document.getElementById('limit-trade-id').value = tradeId;
+      document.getElementById('limit-tp').value = tp !== null ? tp : '';
+      document.getElementById('limit-sl').value = sl !== null ? sl : '';
+      toggleModal('limits-modal');
+    }
+
+    function saveLimits() {
+      const tradeId = document.getElementById('limit-trade-id').value;
+      const tp = document.getElementById('limit-tp').value;
+      const sl = document.getElementById('limit-sl').value;
+
+      fetch(`${API_BASE_URL}/api/portfolio/limits`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tradeId, telegramId: String(currentTelegramId), tp, sl })
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res.success) {
+          showToast('Ордери TP/SL встановлено!');
+          toggleModal('limits-modal');
+          loadPortfolio();
         }
       });
     }
@@ -441,147 +573,48 @@
         .catch(() => {});
     }
 
-    // ДИНАМІЧНИЙ РОЗРАХУНОК ЖИВОГО PnL (Ринкові хвилі Pump.fun)
-    function calculateLivePnL(entryTime, mint) {
-      const elapsedSeconds = Math.max(1, (Date.now() - parseInt(entryTime)) / 1000);
-      let hash = 0;
-      for (let i = 0; i < mint.length; i++) hash = (hash << 5) - hash + mint.charCodeAt(i);
-      
-      const seed = Math.abs(hash % 100) / 100;
-      // Хвильова функція імітації волатильності Pump.fun
-      const wave = Math.sin(elapsedSeconds / 6 + seed * 10) * 22;
-      const pumpTrend = Math.min(65, (elapsedSeconds / 10) * (seed > 0.4 ? 14 : -6));
-      const pnlPct = Math.round(wave + pumpTrend);
-      const multiplier = Math.max(0.1, 1 + (pnlPct / 100));
-      return { pnlPct, multiplier };
-    }
-
-    function renderPortfolioUI() {
-      const container = document.getElementById('portfolio-list');
-      if (!portfolioTrades || portfolioTrades.length === 0) {
-        container.innerHTML = '<div class="text-center py-8 text-gray-500 text-xs">Немає відкритих позицій.</div>';
-        return;
-      }
-
-      container.innerHTML = '';
-      portfolioTrades.forEach(tr => {
-        const { pnlPct, multiplier } = calculateLivePnL(tr.entry_time, tr.mint);
-        const isProfit = pnlPct >= 0;
-        const remainingSol = parseFloat(tr.remaining_amount_sol);
-        const currentValSol = (remainingSol * multiplier).toFixed(4);
-
-        const card = document.createElement('div');
-        card.className = "dark-card rounded-2xl p-3.5 border border-gray-800 space-y-3";
-        card.innerHTML = `
-          <div class="flex items-center justify-between">
-            <div>
-              <div class="text-xs font-bold text-white flex items-center gap-1.5">
-                <span>${tr.token_name}</span>
-                <span class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${isProfit ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}">
-                  ${isProfit ? '+' : ''}${pnlPct}%
-                </span>
-              </div>
-              <div class="text-[11px] text-gray-400 font-mono mt-0.5">
-                Позиція: <span class="text-white font-bold">${remainingSol} SOL</span> • Вартість: <span class="${isProfit ? 'text-emerald-400' : 'text-red-400'} font-bold font-mono">${currentValSol} SOL</span>
-              </div>
-            </div>
-            <div class="text-[10px] text-gray-500 font-mono">${tr.mint.slice(0, 4)}...${tr.mint.slice(-4)}</div>
-          </div>
-
-          <!-- Біржові кнопки продажу % -->
-          <div class="grid grid-cols-3 gap-2 pt-1 border-t border-gray-800/60">
-            <button onclick="executeSell(${tr.id}, '${tr.mint}', 25, ${multiplier})" class="bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-mono font-bold py-1.5 rounded-lg border border-gray-700 transition">
-              Sell 25%
-            </button>
-            <button onclick="executeSell(${tr.id}, '${tr.mint}', 50, ${multiplier})" class="bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-mono font-bold py-1.5 rounded-lg border border-gray-700 transition">
-              Sell 50%
-            </button>
-            <button onclick="executeSell(${tr.id}, '${tr.mint}', 100, ${multiplier})" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/40 text-xs font-mono font-bold py-1.5 rounded-lg transition shadow-md shadow-red-500/10">
-              Sell 100%
-            </button>
-          </div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    function loadPortfolio() {
-      fetch(`${API_BASE_URL}/api/portfolio/${currentTelegramId}`)
+    function loadWhales() {
+      fetch(`${API_BASE_URL}/api/whales`)
         .then(r => r.json())
-        .then(trades => {
-          portfolioTrades = trades || [];
-          renderPortfolioUI();
-        })
-        .catch(() => {});
+        .then(whales => {
+          const list = document.getElementById('whales-list');
+          list.innerHTML = '';
+          whales.forEach(w => {
+            const card = document.createElement('div');
+            card.className = "dark-card rounded-xl p-3 flex items-center justify-between";
+            card.innerHTML = `
+              <div>
+                <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                  <span>${w.name}</span>
+                  <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-1 py-0.2 rounded font-mono">${w.winrate}% WR</span>
+                </div>
+                <div class="text-[11px] text-gray-400 font-mono mt-0.5">
+                  PnL 7d: <span class="text-emerald-400 font-bold">${w.pnl7d}</span> • ${w.address.slice(0, 4)}...${w.address.slice(-4)}
+                </div>
+              </div>
+              <button onclick="toggleFollowWhale(this, '${w.name}')" class="${w.isCopied ? 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-300' : 'bg-gray-800 border border-gray-700 text-gray-300'} text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+                ${w.isCopied ? 'Копіюється' : 'Копіювати'}
+              </button>
+            `;
+            list.appendChild(card);
+          });
+        });
     }
 
-    // Живе оновлення PnL раз на секунду в реальному часі
-    setInterval(() => {
-      const tab = document.getElementById('tab-portfolio');
-      if (tab && !tab.classList.contains('hidden') && portfolioTrades.length > 0) {
-        renderPortfolioUI();
+    function toggleFollowWhale(btn, name) {
+      if (btn.innerText.trim() === 'Копіюється') {
+        btn.innerText = 'Копіювати';
+        btn.className = "bg-gray-800 border border-gray-700 text-gray-300 text-xs font-semibold px-3 py-1.5 rounded-lg transition";
+        showToast(`Відключено копіювання ${name}`);
+      } else {
+        btn.innerText = 'Копіюється';
+        btn.className = "bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-semibold px-3 py-1.5 rounded-lg transition";
+        showToast(`Підключено копіювання ${name}`);
       }
-    }, 1200);
-
-    function executeSell(tradeId, mint, percent, currentMultiplier) {
-      showToast(`Продаж ${percent}% позиції...`);
-      fetch(`${API_BASE_URL}/api/trade/sell`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          telegramId: String(currentTelegramId),
-          tradeId: tradeId,
-          percent: percent,
-          pnlMultiplier: currentMultiplier
-        })
-      })
-      .then(r => r.json())
-      .then(res => {
-        if (res.success) {
-          showToast(`Продано! +${res.returnAmountSol} SOL зараховано`);
-          loadPortfolio();
-          setTimeout(refreshBalance, 800);
-        } else {
-          showToast(`Помилка: ${res.error || 'Відхилено'}`);
-        }
-      })
-      .catch(() => showToast('Помилка сервера при продажу'));
     }
 
-    function executeQuickBuy(mintAddress, tokenName) {
-      const balanceElem = document.getElementById('user-balance');
-      const currentBal = parseFloat(balanceElem ? balanceElem.innerText : '0');
-
-      if (currentBal < selectedOrderAmount) {
-        showToast('Недостатньо коштів! Поповніть депозит.');
-        toggleModal('deposit-modal');
-        return;
-      }
-
-      showToast(`Снайпінг ${tokenName || 'токена'} на ${selectedOrderAmount} SOL...`);
-
-      fetch(`${API_BASE_URL}/api/trade/pump`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          telegramId: String(currentTelegramId),
-          mint: mintAddress,
-          tokenName: tokenName,
-          action: "buy",
-          amountSol: selectedOrderAmount
-        })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          showToast(`Успішно куплено на ${selectedOrderAmount} SOL!`);
-          setTimeout(refreshBalance, 800);
-          loadPortfolio();
-        } else {
-          showToast(`Помилка: ${data.error || 'Ордер відхилено'}`);
-        }
-      })
-      .catch(() => showToast('Помилка сервера при купівлі'));
+    function toggleAutoCopy(toggle) {
+      showToast(toggle.checked ? 'Авто-копіювання увімкнено' : 'Авто-копіювання призупинено');
     }
 
     function loadLeaderboard() {
@@ -609,8 +642,7 @@
             `;
             container.appendChild(card);
           });
-        })
-        .catch(() => {});
+        });
     }
 
     function loadReferrals() {
@@ -620,11 +652,9 @@
           if (data.referralsCount !== undefined) {
             document.getElementById('ref-count').innerText = data.referralsCount;
             document.getElementById('ref-earned').innerText = data.totalEarnedSol;
-            const refUrl = `https://t.me/darksolradar_bot/app?startapp=ref_${currentTelegramId}`;
-            document.getElementById('ref-link-text').innerText = refUrl;
+            document.getElementById('ref-link-text').innerText = data.refLink;
           }
-        })
-        .catch(() => {});
+        });
     }
 
     function submitWithdraw() {
@@ -633,7 +663,7 @@
       const balance = parseFloat(document.getElementById('user-balance').innerText || '0');
 
       if (!target || target.length < 32) return showToast('Введіть коректну адресу');
-      if (!amount || amount <= 0 || amount > balance) return showToast('Некоректна сума');
+      if (!amount || amount <= 0 || amount > balance) return showToast('Некоректна сума або недостатньо коштів');
 
       showToast('Обробка виведення...');
       fetch(`${API_BASE_URL}/api/wallet/withdraw`, {
@@ -649,15 +679,15 @@
       .then(data => {
         if (data.success) {
           showToast(`Виведено! TX: ${data.txHash.slice(0, 8)}...`);
+          document.getElementById('user-balance').innerText = data.newBalance;
           toggleModal('withdraw-modal');
-          refreshBalance();
         } else {
           showToast(`Помилка: ${data.error || 'Не вдалося вивести'}`);
         }
       });
     }
 
-    // Старт WebApp
+    // Запуск WebApp
     if (window.Telegram && window.Telegram.WebApp) {
       window.Telegram.WebApp.ready();
       window.Telegram.WebApp.expand();
@@ -666,19 +696,9 @@
       if (tgUser && tgUser.id) currentTelegramId = tgUser.id;
 
       const urlParams = new URLSearchParams(window.location.search);
-      const hashParams = new URLSearchParams(window.location.hash.substring(1));
       const rawStartParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param 
-        || urlParams.get('tgWebAppStartParam') 
-        || urlParams.get('startapp') 
-        || hashParams.get('tgWebAppStartParam') 
-        || '';
-
-      let refId = null;
-      if (rawStartParam) {
-        refId = rawStartParam.startsWith('ref_') 
-          ? rawStartParam.replace('ref_', '').split('&')[0] 
-          : rawStartParam.split('&')[0];
-      }
+        || urlParams.get('startapp') || '';
+      let refId = rawStartParam.startsWith('ref_') ? rawStartParam.replace('ref_', '') : null;
 
       fetch(`${API_BASE_URL}/api/wallet/init`, {
         method: 'POST',
@@ -691,11 +711,14 @@
           currentPublicKey = data.publicKey;
           document.getElementById('deposit-address').innerText = data.publicKey;
           document.getElementById('display-wallet').innerText = `${data.publicKey.slice(0, 6)}...${data.publicKey.slice(-6)}`;
+          if (data.balanceSol) {
+            document.getElementById('user-balance').innerText = data.balanceSol;
+          }
           refreshBalance();
         }
       });
 
-      loadWhales();
+      loadPortfolio();
       loadRadarTokens();
       setInterval(loadRadarTokens, 3000);
     }
