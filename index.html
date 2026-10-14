@@ -36,11 +36,11 @@
       </div>
       <div>
         <h1 class="text-sm font-bold tracking-wide flex items-center gap-1.5">
-          DARK RADAR <span class="bg-emerald-500/10 text-emerald-400 text-[10px] px-1.5 py-0.5 rounded border border-emerald-500/20 font-mono">PRO</span>
+          DARK RADAR <span class="bg-emerald-500/10 text-emerald-400 text-[10px] px-1.5 py-0.5 rounded border border-emerald-500/20 font-mono">ONCHAIN</span>
         </h1>
         <div class="flex items-center gap-1 text-[11px] text-gray-400">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span>Axiom & Pump Feed • 1% Fee</span>
+          <span>PumpPortal Whale Listener</span>
         </div>
       </div>
     </div>
@@ -54,7 +54,7 @@
     </div>
   </header>
 
-  <!-- Баланс та Розмір ордера -->
+  <!-- Баланс та Налаштування -->
   <section class="p-4 space-y-3">
     <div class="dark-card rounded-2xl p-4 glow-green">
       <div class="flex justify-between items-start mb-2">
@@ -79,7 +79,7 @@
       </div>
     </div>
 
-    <!-- Селектор швидкої ставки -->
+    <!-- Селектор ставки -->
     <div class="dark-card rounded-xl p-2.5 flex items-center justify-between">
       <span class="text-xs text-gray-400 font-medium pl-1">Розмір ордера:</span>
       <div class="flex gap-1.5 font-mono text-xs" id="amount-presets">
@@ -93,11 +93,11 @@
 
   <!-- Вкладки навігації -->
   <div class="px-4 flex gap-2 border-b border-gray-800 overflow-x-auto no-scrollbar">
-    <button onclick="switchTab('portfolio')" id="tab-btn-portfolio" class="pb-2.5 px-3 text-xs font-bold text-emerald-400 border-b-2 border-emerald-400 transition flex items-center gap-1.5 whitespace-nowrap">
-      <i class="fa-solid fa-chart-line"></i> Позиції PnL
+    <button onclick="switchTab('radar')" id="tab-btn-radar" class="pb-2.5 px-3 text-xs font-bold text-emerald-400 border-b-2 border-emerald-400 transition flex items-center gap-1.5 whitespace-nowrap">
+      <i class="fa-solid fa-satellite-dish"></i> Стрім китів
     </button>
-    <button onclick="switchTab('radar')" id="tab-btn-radar" class="pb-2.5 px-3 text-xs font-bold text-gray-400 hover:text-gray-200 transition flex items-center gap-1.5 whitespace-nowrap">
-      <i class="fa-solid fa-satellite-dish"></i> AI Радар
+    <button onclick="switchTab('portfolio')" id="tab-btn-portfolio" class="pb-2.5 px-3 text-xs font-bold text-gray-400 hover:text-gray-200 transition flex items-center gap-1.5 whitespace-nowrap">
+      <i class="fa-solid fa-chart-line"></i> Позиції PnL
     </button>
     <button onclick="switchTab('whales')" id="tab-btn-whales" class="pb-2.5 px-3 text-xs font-bold text-gray-400 hover:text-gray-200 transition flex items-center gap-1.5 whitespace-nowrap">
       <i class="fa-solid fa-users"></i> Топ-Кити
@@ -112,8 +112,19 @@
 
   <!-- Контент вкладок -->
   <main class="flex-1 p-4 overflow-y-auto">
-    <!-- Вкладка 1: Портфель -->
-    <div id="tab-portfolio" class="space-y-3">
+    <!-- Вкладка 1: Стрім угод китів (Новий живий радар) -->
+    <div id="tab-radar" class="space-y-3">
+      <div class="flex justify-between items-center mb-1">
+        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Живі покупки китів (Onchain Stream)</span>
+        <span class="text-[11px] text-emerald-400 font-mono animate-pulse">● LIVE WHALES</span>
+      </div>
+      <div id="whale-trades-list" class="space-y-2.5">
+        <div class="text-center py-8 text-gray-500 text-xs">Очікування першої ончейн-угоди китів...</div>
+      </div>
+    </div>
+
+    <!-- Вкладка 2: Портфель (Позиції Live PnL) -->
+    <div id="tab-portfolio" class="hidden space-y-3">
       <div class="flex justify-between items-center mb-1">
         <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Відкриті позиції (Live PnL)</span>
         <button onclick="loadPortfolio()" class="text-xs text-emerald-400 hover:text-white flex items-center gap-1">
@@ -121,25 +132,14 @@
         </button>
       </div>
       <div id="portfolio-list" class="space-y-3">
-        <div class="text-center py-8 text-gray-500 text-xs">Позицій немає. Зробіть снайпінг у вкладці «AI Радар».</div>
-      </div>
-    </div>
-
-    <!-- Вкладка 2: AI Радар -->
-    <div id="tab-radar" class="hidden space-y-3">
-      <div class="flex justify-between items-center mb-1">
-        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Нові пули (Pump.fun Stream)</span>
-        <span class="text-[11px] text-cyan-400 font-mono animate-pulse">● LIVE STREAM</span>
-      </div>
-      <div id="radar-token-list" class="space-y-2.5">
-        <div class="text-center py-8 text-gray-500 text-xs">Очікування нових пулів Pump.fun...</div>
+        <div class="text-center py-8 text-gray-500 text-xs">Позицій немає. Увімкніть авто-копіювання або повторіть угоду зі стріму китів.</div>
       </div>
     </div>
 
     <!-- Вкладка 3: Топ-Кити -->
     <div id="tab-whales" class="hidden space-y-3">
       <div class="flex justify-between items-center mb-1">
-        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Кити для копіювання</span>
+        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Відстежувані кити</span>
         <button onclick="toggleModal('custom-whale-modal')" class="text-xs text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1">
           <i class="fa-solid fa-plus text-[10px]"></i> Свій кит
         </button>
@@ -268,6 +268,32 @@
     </div>
   </div>
 
+  <!-- Модалка додавання кастомного кита -->
+  <div id="custom-whale-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="dark-card rounded-2xl max-w-sm w-full p-5 relative border border-gray-700">
+      <button onclick="toggleModal('custom-whale-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+      <div class="flex items-center gap-2 mb-3 text-emerald-400">
+        <i class="fa-solid fa-user-plus text-lg"></i>
+        <h3 class="font-bold text-sm text-white">Додати свого кита</h3>
+      </div>
+      <div class="space-y-3 mb-4">
+        <div>
+          <label class="text-[11px] text-gray-400 block mb-1">Назва / Тег</label>
+          <input type="text" id="custom-whale-name" placeholder="Top Sniper" class="w-full bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+        </div>
+        <div>
+          <label class="text-[11px] text-gray-400 block mb-1">Адреса гаманця Solana</label>
+          <input type="text" id="custom-whale-address" placeholder="Введіть 44-значну адресу..." class="w-full bg-gray-900 border border-gray-800 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500">
+        </div>
+      </div>
+      <button onclick="submitCustomWhale()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs py-2.5 rounded-xl transition">
+        Підключити моніторинг
+      </button>
+    </div>
+  </div>
+
   <!-- Тост сповіщень -->
   <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 border border-emerald-500/40 text-emerald-300 px-4 py-2 rounded-xl text-xs shadow-2xl transition-opacity duration-300 opacity-0 pointer-events-none z-50 font-mono">
     Повідомлення
@@ -319,7 +345,7 @@
     }
 
     function switchTab(tab) {
-      ['portfolio', 'radar', 'whales', 'leaderboard', 'referrals'].forEach(t => {
+      ['radar', 'portfolio', 'whales', 'leaderboard', 'referrals'].forEach(t => {
         const el = document.getElementById(`tab-${t}`);
         if (el) el.classList.add('hidden');
         const btn = document.getElementById(`tab-btn-${t}`);
@@ -331,8 +357,8 @@
       const activeBtn = document.getElementById(`tab-btn-${tab}`);
       if (activeBtn) activeBtn.className = "pb-2.5 px-3 text-xs font-bold text-emerald-400 border-b-2 border-emerald-400 transition flex items-center gap-1.5 whitespace-nowrap";
 
+      if (tab === 'radar') loadWhaleTrades();
       if (tab === 'portfolio') loadPortfolio();
-      if (tab === 'radar') loadRadarTokens();
       if (tab === 'whales') loadWhales();
       if (tab === 'leaderboard') loadLeaderboard();
       if (tab === 'referrals') loadReferrals();
@@ -363,6 +389,47 @@
       }
     }
 
+    // Завантаження живих угод китів (Новий стрім)
+    function loadWhaleTrades() {
+      fetch(`${API_BASE_URL}/api/radar/whale-trades`)
+        .then(r => r.json())
+        .then(trades => {
+          const container = document.getElementById('whale-trades-list');
+          if (!trades || trades.length === 0) {
+            container.innerHTML = '<div class="text-center py-8 text-gray-500 text-xs">Слухаємо мережу... Перша покупка кита з\'явиться тут автоматично.</div>';
+            return;
+          }
+          container.innerHTML = '';
+          trades.forEach(t => {
+            const card = document.createElement('div');
+            card.className = "dark-card rounded-xl p-3 flex items-center justify-between border-l-2 border-emerald-500";
+            card.innerHTML = `
+              <div class="pr-2 truncate">
+                <div class="text-xs font-bold text-white flex items-center gap-1.5 truncate">
+                  <span class="text-emerald-400 font-bold">${t.whaleName}</span>
+                  <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-1 py-0.2 rounded font-mono">BUY ${t.solAmount} SOL</span>
+                </div>
+                <div class="text-[11px] text-gray-400 font-mono mt-0.5 truncate">
+                  Час: ${t.time} • Токен: ${t.mint.slice(0, 4)}...${t.mint.slice(-4)}
+                </div>
+              </div>
+              <button onclick="executeQuickBuy('${t.mint}', '${t.tokenName}')" class="shrink-0 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs px-2.5 py-1.5 rounded-lg transition shadow-md shadow-emerald-500/20 font-mono">
+                Копія ${selectedOrderAmount} SOL
+              </button>
+            `;
+            container.appendChild(card);
+          });
+        })
+        .catch(() => {});
+    }
+
+    setInterval(() => {
+      const tab = document.getElementById('tab-radar');
+      if (tab && !tab.classList.contains('hidden')) {
+        loadWhaleTrades();
+      }
+    }, 2500);
+
     async function renderPortfolioUI() {
       const container = document.getElementById('portfolio-list');
       if (!portfolioTrades || portfolioTrades.length === 0) {
@@ -377,20 +444,25 @@
         const liveData = await fetchLiveTokenData(tr.mint);
         const currentPrice = parseFloat(liveData.priceSol || entryPrice);
 
+        // Реальний біржовий розрахунок PnL
         const pnlPct = ((currentPrice - entryPrice) / entryPrice) * 100;
         const isProfit = pnlPct >= 0;
         const currentValSol = (remainingSol * (currentPrice / entryPrice)).toFixed(4);
 
         if (tr.take_profit_pct && pnlPct >= tr.take_profit_pct) {
-          showToast(`🎯 Тейк-профіт +${pnlPct.toFixed(1)}% спрацював на ${tr.token_name}!`);
+          showToast(`🎯 TP +${pnlPct.toFixed(1)}% спрацював на ${tr.token_name}!`);
           executeSell(tr.id, tr.mint, 100, currentPrice);
           return;
         }
         if (tr.stop_loss_pct && pnlPct <= -Math.abs(tr.stop_loss_pct)) {
-          showToast(`🛑 Стоп-лос -${Math.abs(pnlPct).toFixed(1)}% спрацював на ${tr.token_name}!`);
+          showToast(`🛑 SL -${Math.abs(pnlPct).toFixed(1)}% спрацював на ${tr.token_name}!`);
           executeSell(tr.id, tr.mint, 100, currentPrice);
           return;
         }
+
+        const whaleBadge = tr.copied_from_whale 
+          ? `<span class="text-[9px] bg-cyan-500/10 text-cyan-400 px-1 py-0.2 rounded font-mono">Кит: ${tr.copied_from_whale}</span>` 
+          : '';
 
         const card = document.createElement('div');
         card.className = "dark-card rounded-2xl p-4 border border-gray-800 space-y-3";
@@ -402,6 +474,7 @@
                 <span class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${isProfit ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}">
                   ${isProfit ? '+' : ''}${pnlPct.toFixed(2)}% PnL
                 </span>
+                ${whaleBadge}
               </div>
               <div class="text-[11px] text-gray-400 font-mono mt-1">
                 Позиція: <span class="text-white font-bold">${remainingSol} SOL</span> • Вартість: <span class="${isProfit ? 'text-emerald-400' : 'text-red-400'} font-bold font-mono">${currentValSol} SOL</span>
@@ -548,37 +621,6 @@
       });
     }
 
-    function loadRadarTokens() {
-      fetch(`${API_BASE_URL}/api/radar/latest`)
-        .then(r => r.json())
-        .then(tokens => {
-          if (!tokens || tokens.length === 0) return;
-          const container = document.getElementById('radar-token-list');
-          container.innerHTML = '';
-          tokens.forEach(t => {
-            const card = document.createElement('div');
-            card.className = "dark-card rounded-xl p-3 flex items-center justify-between border-l-2 border-emerald-500";
-            card.innerHTML = `
-              <div class="pr-2 truncate">
-                <div class="text-xs font-bold text-white flex items-center gap-1.5 truncate">
-                  <span class="truncate max-w-[110px]">${t.name}</span>
-                  <span class="text-[10px] text-gray-400 font-mono">($${t.symbol})</span>
-                  <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-1 py-0.2 rounded font-mono shrink-0">AI ${t.aiScore}%</span>
-                </div>
-                <div class="text-[11px] text-gray-400 font-mono mt-0.5">
-                  Час: ${t.time} • Mint: ${t.mint.slice(0, 4)}...${t.mint.slice(-4)}
-                </div>
-              </div>
-              <button onclick="executeQuickBuy('${t.mint}', '${t.name.replace(/'/g, "")}')" class="shrink-0 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs px-2.5 py-1.5 rounded-lg transition shadow-md shadow-emerald-500/20 font-mono">
-                ${selectedOrderAmount} SOL
-              </button>
-            `;
-            container.appendChild(card);
-          });
-        })
-        .catch(() => {});
-    }
-
     function loadWhales() {
       fetch(`${API_BASE_URL}/api/whales`)
         .then(r => r.json())
@@ -621,6 +663,26 @@
 
     function toggleAutoCopy(toggle) {
       showToast(toggle.checked ? 'Авто-копіювання увімкнено' : 'Авто-копіювання призупинено');
+    }
+
+    function submitCustomWhale() {
+      const address = document.getElementById('custom-whale-address').value.trim();
+      const name = document.getElementById('custom-whale-name').value.trim();
+      if (!address || address.length < 32) return showToast('Введіть дійсну адресу');
+
+      fetch(`${API_BASE_URL}/api/whales/custom`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address, name })
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res.success) {
+          showToast('Кита додано!');
+          toggleModal('custom-whale-modal');
+          loadWhales();
+        }
+      });
     }
 
     function loadLeaderboard() {
@@ -693,7 +755,7 @@
       });
     }
 
-    // Ініціалізація WebApp
+    // Запуск WebApp
     if (window.Telegram && window.Telegram.WebApp) {
       window.Telegram.WebApp.ready();
       window.Telegram.WebApp.expand();
@@ -724,9 +786,8 @@
         }
       });
 
+      loadWhaleTrades();
       loadPortfolio();
-      loadRadarTokens();
-      setInterval(loadRadarTokens, 3000);
     }
   </script>
 </body>
