@@ -99,14 +99,14 @@
     <button onclick="switchTab('radar')" id="tab-btn-radar" class="pb-2.5 px-3 text-xs font-bold text-gray-400 hover:text-gray-200 transition flex items-center gap-1.5 whitespace-nowrap">
       <i class="fa-solid fa-satellite-dish"></i> AI Радар
     </button>
+    <button onclick="switchTab('portfolio')" id="tab-btn-portfolio" class="pb-2.5 px-3 text-xs font-bold text-gray-400 hover:text-gray-200 transition flex items-center gap-1.5 whitespace-nowrap">
+      <i class="fa-solid fa-chart-pie"></i> Портфель
+    </button>
     <button onclick="switchTab('leaderboard')" id="tab-btn-leaderboard" class="pb-2.5 px-3 text-xs font-bold text-gray-400 hover:text-gray-200 transition flex items-center gap-1.5 whitespace-nowrap">
       <i class="fa-solid fa-trophy"></i> Лідерборд
     </button>
     <button onclick="switchTab('referrals')" id="tab-btn-referrals" class="pb-2.5 px-3 text-xs font-bold text-gray-400 hover:text-gray-200 transition flex items-center gap-1.5 whitespace-nowrap">
       <i class="fa-solid fa-handshake"></i> Партнери
-    </button>
-    <button onclick="switchTab('portfolio')" id="tab-btn-portfolio" class="pb-2.5 px-3 text-xs font-bold text-gray-400 hover:text-gray-200 transition flex items-center gap-1.5 whitespace-nowrap">
-      <i class="fa-solid fa-chart-pie"></i> Портфель
     </button>
   </div>
 
@@ -136,7 +136,20 @@
       </div>
     </div>
 
-    <!-- Вкладка 3: Лідерборд -->
+    <!-- Вкладка 3: Портфель (Активні позиції) -->
+    <div id="tab-portfolio" class="hidden space-y-3">
+      <div class="flex justify-between items-center mb-1">
+        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Відкриті позиції</span>
+        <button onclick="loadPortfolio()" class="text-xs text-gray-400 hover:text-white flex items-center gap-1">
+          <i class="fa-solid fa-rotate-right text-[10px]"></i> Оновити
+        </button>
+      </div>
+      <div id="portfolio-list" class="space-y-2.5">
+        <div class="text-center py-8 text-gray-500 text-xs">Позицій немає. Зробіть снайпінг або увімкніть копі-трейд.</div>
+      </div>
+    </div>
+
+    <!-- Вкладка 4: Лідерборд -->
     <div id="tab-leaderboard" class="hidden space-y-3">
       <div class="flex justify-between items-center mb-1">
         <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Топ трейдерів тижня</span>
@@ -147,7 +160,7 @@
       </div>
     </div>
 
-    <!-- Вкладка 4: Партнери (Рефералка) -->
+    <!-- Вкладка 5: Партнери (Рефералка) -->
     <div id="tab-referrals" class="hidden space-y-4">
       <div class="dark-card rounded-2xl p-4 border-l-4 border-emerald-500">
         <div class="flex items-center gap-2 mb-2 text-emerald-400 font-bold text-sm">
@@ -178,15 +191,6 @@
             <i class="fa-regular fa-copy"></i> Копіювати
           </button>
         </div>
-      </div>
-    </div>
-
-    <!-- Вкладка 5: Портфель -->
-    <div id="tab-portfolio" class="hidden space-y-3">
-      <div class="dark-card rounded-xl p-4 text-center">
-        <div class="text-xs text-gray-400 mb-1">Відкриті авто-угоди</div>
-        <div id="open-trades-count" class="text-2xl font-bold font-mono text-emerald-400">0</div>
-        <div class="text-[11px] text-gray-500 mt-2">Ордери формуються автоматично при сигналах від обраних китів.</div>
       </div>
     </div>
   </main>
@@ -327,7 +331,7 @@
     }
 
     function switchTab(tab) {
-      ['whales', 'radar', 'leaderboard', 'referrals', 'portfolio'].forEach(t => {
+      ['whales', 'radar', 'portfolio', 'leaderboard', 'referrals'].forEach(t => {
         const el = document.getElementById(`tab-${t}`);
         if (el) el.classList.add('hidden');
         const btn = document.getElementById(`tab-btn-${t}`);
@@ -340,6 +344,7 @@
       if (activeBtn) activeBtn.className = "pb-2.5 px-3 text-xs font-bold text-emerald-400 border-b-2 border-emerald-400 transition flex items-center gap-1.5 whitespace-nowrap";
 
       if (tab === 'radar') loadRadarTokens();
+      if (tab === 'portfolio') loadPortfolio();
       if (tab === 'leaderboard') loadLeaderboard();
       if (tab === 'referrals') loadReferrals();
     }
@@ -416,11 +421,7 @@
       fetch(`${API_BASE_URL}/api/whales/custom`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          telegramId: String(currentTelegramId),
-          address: address,
-          name: name
-        })
+        body: JSON.stringify({ address, name })
       })
       .then(r => r.json())
       .then(res => {
@@ -464,6 +465,63 @@
           });
         })
         .catch(() => {});
+    }
+
+    function loadPortfolio() {
+      fetch(`${API_BASE_URL}/api/portfolio/${currentTelegramId}`)
+        .then(r => r.json())
+        .then(trades => {
+          const container = document.getElementById('portfolio-list');
+          if (!trades || trades.length === 0) {
+            container.innerHTML = '<div class="text-center py-8 text-gray-500 text-xs">Немає відкритих позицій.</div>';
+            return;
+          }
+          container.innerHTML = '';
+          trades.forEach(tr => {
+            const card = document.createElement('div');
+            card.className = "dark-card rounded-xl p-3 flex items-center justify-between border-l-2 border-cyan-500";
+            card.innerHTML = `
+              <div>
+                <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                  <span>${tr.token_name}</span>
+                  <span class="text-[10px] text-emerald-400 font-mono">+18.4% PnL</span>
+                </div>
+                <div class="text-[11px] text-gray-400 font-mono mt-0.5">
+                  Вхід: ${tr.amount_sol} SOL • ${tr.mint.slice(0, 4)}...${tr.mint.slice(-4)}
+                </div>
+              </div>
+              <button onclick="executeSell(${tr.id}, '${tr.mint}')" class="bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white border border-red-500/40 text-xs font-bold px-3 py-1.5 rounded-lg transition">
+                Sell 100%
+              </button>
+            `;
+            container.appendChild(card);
+          });
+        })
+        .catch(() => {});
+    }
+
+    function executeSell(tradeId, mint) {
+      showToast('Відправка ордера на продаж...');
+      fetch(`${API_BASE_URL}/api/trade/sell`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          telegramId: String(currentTelegramId),
+          tradeId: tradeId,
+          mint: mint
+        })
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res.success) {
+          showToast(`Успішно продано! TX: ${res.txHash.slice(0, 8)}...`);
+          loadPortfolio();
+          refreshBalance();
+        } else {
+          showToast(`Помилка продажу: ${res.error || 'Відхилено'}`);
+        }
+      })
+      .catch(() => showToast('Помилка сервера при продажу'));
     }
 
     function loadLeaderboard() {
@@ -527,6 +585,7 @@
         body: JSON.stringify({
           telegramId: String(currentTelegramId),
           mint: mintAddress,
+          tokenName: tokenName,
           action: "buy",
           amountSol: selectedOrderAmount
         })
@@ -535,8 +594,8 @@
       .then(data => {
         if (data.success) {
           showToast(`Успішно куплено! TX: ${data.txHash.slice(0, 8)}...`);
-          const countElem = document.getElementById('open-trades-count');
-          if (countElem) countElem.innerText = parseInt(countElem.innerText || '0') + 1;
+          refreshBalance();
+          loadPortfolio();
         } else {
           showToast(`Помилка: ${data.error || 'Ордер відхилено'}`);
         }
@@ -592,7 +651,6 @@
         currentTelegramId = tgUser.id;
       }
 
-     // Зчитування реферального параметра
       const urlParams = new URLSearchParams(window.location.search);
       const hashParams = new URLSearchParams(window.location.hash.substring(1));
       
